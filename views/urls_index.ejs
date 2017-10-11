@@ -3,7 +3,12 @@
 <head>
   <title>TinyApp</title>
 </head>
+<ul>
+   <% for (url in urls) { %>
+   <li><%= url %> : <%= urls[url]%></li>
+   <% } %>
+  </ul>
 <body>
-    <!-- Add your EJS code here -->
+ <a href="url">EDIT</a>
 </body>
 </html>
