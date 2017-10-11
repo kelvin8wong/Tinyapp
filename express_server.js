@@ -16,14 +16,26 @@ app.get("/", (req, res) => {
   res.end("Hello!");
 });
 
+//home page
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+//to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id };
   res.render("urls_show", templateVars);
+});
+
+//to make URL Submission Form
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+app.post("/urls", (req, res) => {
+  console.log(req.body);  // debug statement to see POST parameters
+  res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 app.get("/hello", (req, res) => {
