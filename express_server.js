@@ -12,6 +12,10 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+function generateRandomString() {
+  return Math.random().toString().substr(2,6);
+}
+
 app.get("/", (req, res) => {
   res.end("Hello!");
 });
