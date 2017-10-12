@@ -28,21 +28,30 @@ app.post('/login', (req, res) => {
 
 //home page
 app.get("/urls", (req, res) => {
-  console.log('Hello,', req.cookies.username);
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { 
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.render("urls_index", templateVars);
 });
 
+// to log out
+app.post('/logout', (req, res) => {
+  res.clearCookie('username',req.cookies.username);
+  res.redirect('/urls');
+})
+
 //new URL submission form
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  res.render("urls_new", {username: req.cookies.username});
 });
 
 //to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
   let templateVars = { 
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id]
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies.username
    };
   res.render("urls_show", templateVars);
 });
@@ -73,10 +82,6 @@ app.post("/urls", (req, res) => {
   let longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect(`http://localhost:8080/urls/${shortURL}`);
-});
-
-app.get("/hello", (req, res) => {
-  res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
