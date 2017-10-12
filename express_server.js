@@ -3,6 +3,10 @@ const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 app.set("view engine", "ejs")
 
+//added cookie-parser 
+var cookieParser = require('cookie-parser')
+app.use(cookieParser())
+
 //added body-parser to access POST request
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -16,8 +20,15 @@ function generateRandomString() {
   return Math.random().toString(36).substr(2,6);
 }
 
+//to set cookie to username
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
+})
+
 //home page
 app.get("/urls", (req, res) => {
+  console.log('Hello,', req.cookies.username);
   let templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
