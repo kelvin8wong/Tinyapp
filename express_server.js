@@ -31,11 +31,18 @@ app.get("/urls/:id", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//to make URL Submission Form
+// to redirect short URL
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+
+//new URL submission form
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// to add sumbmitted URL to database
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
