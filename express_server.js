@@ -22,6 +22,11 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templateVars);
 });
 
+//new URL submission form
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
 //to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
   let templateVars = { 
@@ -35,11 +40,6 @@ app.get("/urls/:id", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
-});
-
-//new URL submission form
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
 });
 
 //to delete an url and rediect to the home page

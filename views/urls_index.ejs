@@ -17,13 +17,13 @@
   </table>
   <% for (url in urls) { %>
     <form method="POST" action="/urls/<%=url%>/delete">
-     <table cellpadding="15" cellspacing="2">
-      <td><font size =3><a href='/urls/<%= url %>'><%= url %> </a></font></td> <td><font size =3><a href="<%= urls[url]%>"><%= urls[url]%> </a></font></td><td><button type="submit">Delete</button></td><td><a href ='/urls/<%= url %>'>Edit</a></td>
+      <table cellpadding="15" cellspacing="2">
+        <td><font size =3><a href='/urls/<%= url %>'><%= url %> </a></font></td> <td><font size =3><a href="<%= urls[url]%>"><%= urls[url]%> </a></font></td><td><button type="submit">Delete</button></td><td><a href ='/urls/<%= url %>'>Edit</a></td>
       </table>
     </form>  
   <% } %>
   <p>
-    <a href="url">TRIM ME!</a>
+    <a href="urls/new">TRIM ME!</a>
   </p>
 </body>
 </html>
