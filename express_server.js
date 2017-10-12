@@ -48,6 +48,14 @@ app.post("/urls/:id/delete", (req, res) => {
   res.redirect('/urls');
 });
 
+//to update an url and rediect to the home page
+app.post("/urls/:id", (req, res) => {
+  let shortURL = req.params.id
+  let longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect('/urls');
+});
+
 // to add sumbmitted URL to database
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
