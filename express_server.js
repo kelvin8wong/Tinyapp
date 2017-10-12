@@ -16,6 +16,19 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = { 
+  "Kelvin": {
+    id: "Kelvin", 
+    email: "kelvin@gmail.com", 
+    password: "123456"
+  },
+ "Wong": {
+    id: "Wong", 
+    email: "wong@gmail.com", 
+    password: "123456"
+  }
+};
+
 function generateRandomString() {
   return Math.random().toString(36).substr(2,6);
 }
