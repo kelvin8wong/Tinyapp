@@ -42,6 +42,12 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//to delete an url and rediect to the home page
+app.post("/urls/:id/delete", (req, res) => {
+  delete urlDatabase[req.params.id];
+  res.redirect('/urls');
+});
+
 // to add sumbmitted URL to database
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();

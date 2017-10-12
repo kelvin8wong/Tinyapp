@@ -4,12 +4,26 @@
   <title>TinyApp</title>
 </head>
 <body>
-    <% include partials/_header %>
-<ul>
-   <% for (url in urls) { %>
-   <li><%= url %> : <%= urls[url]%></li>
-   <% } %>
-  </ul>
- <a href="url">EDIT</a>
+  <% include partials/_header %>
+  <table cellpadding="5" cellspacing="2">
+      <tbody>
+        <tr style="height: 0px;">
+          <td><span style="text-decoration: underline;"><strong>Short URL</strong></span>
+          </td>
+          <td><span style="text-decoration: underline;"><strong>Long URL</strong></span>
+          </td>
+        </tr>
+      </tbody>
+  </table>
+  <% for (url in urls) { %>
+    <form method="POST" action="/urls/<%=url%>/delete">
+     <table cellpadding="15" cellspacing="2">
+      <td><font size =3><%= url %> </font></td> <td><font size =3><%= urls[url]%></font></td><td><button type="submit">Delete</button></font></td>
+      </table>
+    </form>  
+  <% } %>
+  <p>
+    <a href="url">TRIM ME!</a>
+  </p>
 </body>
 </html>
