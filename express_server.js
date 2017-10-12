@@ -13,12 +13,8 @@ const urlDatabase = {
 };
 
 function generateRandomString() {
-  return Math.random().toString().substr(2,6);
+  return Math.random().toString(36).substr(2,6);
 }
-
-app.get("/", (req, res) => {
-  res.end("Hello!");
-});
 
 //home page
 app.get("/urls", (req, res) => {
@@ -28,7 +24,10 @@ app.get("/urls", (req, res) => {
 
 //to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id };
+  let templateVars = { 
+    shortURL: req.params.id,
+    longURL: urlDatabase[req.params.id]
+   };
   res.render("urls_show", templateVars);
 });
 
@@ -38,8 +37,10 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  let shortURL = generateRandomString();
+  let longURL = req.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  res.redirect(`http://localhost:8080/urls/${shortURL}`);
 });
 
 app.get("/hello", (req, res) => {
