@@ -29,44 +29,78 @@ const users = {
   }
 };
 
+//to get random id
 function generateRandomString() {
   return Math.random().toString(36).substr(2,6);
 }
 
-//to set cookie to username
+//to check if user email exists
+function checkEmail (inputEmail) {
+  for (let user in userDatabase) {
+    if (userDatabase[user].email === inputEmail) {
+      return false;
+    };
+  };
+}
+
+//to set cookie to user_id
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
+  res.cookie('user_id', req.body.email);
   res.redirect('/urls');
 })
 
 //new registration user page
-app.get("/urls/register", (req, res) => {
+app.get('/urls/register', (req, res) => {
   let templateVars = { 
     urls: urlDatabase,
-    user: req.cookies["username"]
+    user: req.cookies.user_id
   };
-  res.render("urls_register", templateVars);
+  res.render('urls_register', templateVars);
 });
 
+//to add new registered user and set cookies to userId
+app.post('/urls/register', (req,res) => {
+  let userId = generateRandomString();
+  let userPassword = req.body.password;
+  let userEmail = req.body.email;
+//if the e-mail or password are empty strings, or email already existed, send 400
+  if (!userEmail || !userPassword) {
+    res.status(400);
+    res.send('Email or password field cannot be empty')
+    return;
+  } else if (checkEmail(userEmail) === false) {
+    res.status(400);
+    res.send('Email already in use');
+    return;
+  } else {
+    users[userId] = {
+      id: userId,
+      email: userEmail,
+      password: userPassword
+    }
+    res.cookie('user_id', userId);
+    res.redirect('/urls');
+  }
+});
+ 
 //home page
 app.get("/urls", (req, res) => {
   let templateVars = { 
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: req.cookies.user_id
   };
   res.render("urls_index", templateVars);
 });
 
-
 // to log out
 app.post('/logout', (req, res) => {
-  res.clearCookie('username',req.cookies.username);
+  res.clearCookie('user_id',req.cookies.user_id);
   res.redirect('/urls');
 })
 
 //new URL submission form
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new", {username: req.cookies.username});
+  res.render("urls_new", {user: req.cookies.user_id});
 });
 
 //to show single URL and its shortened form
@@ -74,7 +108,7 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = { 
     shortURL: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies.username
+    user: req.cookies.user_id
    };
   res.render("urls_show", templateVars);
 });
