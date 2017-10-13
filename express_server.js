@@ -17,13 +17,13 @@ const urlDatabase = {
 };
 
 const users = { 
-  "Kelvin": {
-    id: "Kelvin", 
+  "b2xVn2": {
+    id: "b2xVn2", 
     email: "kelvin@gmail.com", 
     password: "123456"
   },
- "Wong": {
-    id: "Wong", 
+ "9sm5xK": {
+    id: "9sm5xK", 
     email: "wong@gmail.com", 
     password: "123456"
   }
@@ -39,6 +39,15 @@ app.post('/login', (req, res) => {
   res.redirect('/urls');
 })
 
+//new registration user page
+app.get("/urls/register", (req, res) => {
+  let templateVars = { 
+    urls: urlDatabase,
+    user: req.cookies["username"]
+  };
+  res.render("urls_register", templateVars);
+});
+
 //home page
 app.get("/urls", (req, res) => {
   let templateVars = { 
@@ -47,6 +56,7 @@ app.get("/urls", (req, res) => {
   };
   res.render("urls_index", templateVars);
 });
+
 
 // to log out
 app.post('/logout', (req, res) => {
