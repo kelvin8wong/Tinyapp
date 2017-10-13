@@ -1,15 +1,14 @@
 <h1>Welcome to TinyApp</h1>
 <br></br>
-<% if(!username) { %>
-    <form method="POST" action="/login">
-        <strong>Username:</strong><br>
-        <input style="width: 300px; height: 20px" type="text" name="username" placeholder="Enter username"><br>
-        <input type="submit" value="Sign In">
+<% if(!user) { %>
+        <a href='/login'>Login</a>
+        <a href='/register'>Register</a>
     </form>
     <br></br>
 <% } else { %>
     <form method="POST" action="/logout">
-         <input type="submit" value="Logout">
+        <h3>Welcome <%= user %></h3>
+        <button>Logout</button>
     </form>
     <br></br>
 <% } %>
