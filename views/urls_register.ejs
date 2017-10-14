@@ -4,13 +4,15 @@
      <title>TinyApp</title>
   </head>
   <body style="font-size:20px; padding:50px;">
-    <% include partials/_header %>
-    <form action="/urls/register" method="POST"">
+    <h1>Welcome to TinyApp</h1>
+    <form action="/register" method="POST"">
       <strong><label>Register Here:</label></strong>
       <br></br>
-      <input style="width: 300px; height: 20px"  id="email" type="email" name="email" placeholder="Email" style="width: 300px">
+      <label for="email">Email:</label>
+      <input style="width: 300px; height: 20px"  id="email" type="email" name="email">
       <br></br>
-      <input style="width: 300px; height: 20px" id="password" type="password" name="password" placeholder="Password" style="width: 300px">
+      <label for="password">Password:</label>
+      <input style="width: 300px; height: 20px" id="password" type="password" name="password">
       <br></br>
       <input type="submit" value="Submit">
     </form>
