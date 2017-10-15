@@ -4,6 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 const cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
 
 ///////////////MIDDLEWARE
 app.set("view engine", "ejs")
@@ -36,12 +37,12 @@ const users = {
   "userid1": {
     id: "userid1", 
     email: "kelvin@gmail.com", 
-    password: "123456"
+    hashedPassword: "123456"
   },
   "userid2": {
     id: "userid2", 
     email: "wong@gmail.com", 
-    password: "123456"
+    hashedPassword: "123"
   }
 };
 ///////////////FUNCTIONS
@@ -71,6 +72,11 @@ function urlsForUser(id) {
   return  obj;
 }
 
+//home page
+app.get('/', (req, res) => {
+  res.render('urls_login');
+});
+
 //registration user page
 app.get('/register', (req, res) => {
   res.render('urls_register');
@@ -79,10 +85,10 @@ app.get('/register', (req, res) => {
 //to add new registered user and set cookies
 app.post('/register', (req,res) => {
   let id = generateRandomString();
-  let password = req.body.password;
   let email = req.body.email;
-//if the e-mail or password are empty strings, or email already existed, send 400
-  if (!email || !password) {
+  let password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  if (email === "" || hashedPassword === "") {
     res.status(400).send('Email or password field cannot be empty!');
     return;
   } else {
@@ -93,7 +99,7 @@ app.post('/register', (req,res) => {
       }
     }
   }
-  users[id] = { id, email, password };
+  users[id] = { id, email, hashedPassword };
   res.cookie("user_id", id);
   res.redirect("/urls")
 });
@@ -104,10 +110,12 @@ app.post('/login', (req, res) => {
   let password = req.body.password;
   for (let user_id in users ) {
     const user = users[user_id];
-    if (email === user.email && password === user.password){
-      res.cookie("user_id", user.id);
-      res.redirect("/urls");
-      return;
+    if (email === user.email) {
+      if (bcrypt.compareSync(password, user.hashedPassword)){
+        res.cookie("user_id", user.id);
+        res.redirect("/urls");
+        return;
+      }
     } 
   }
   res.status(403).send("Wrong email or password!");
