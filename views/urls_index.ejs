@@ -14,14 +14,16 @@
           </td>
         </tr>
       </tbody>
-  </table>
-  <% for (url in userUrls) { %>
-    <form method="POST" action="/urls/<%=url%>/delete">
-      <table cellpadding="15" cellspacing="2">
-        <td><font size =3><a href='/u/<%= url %>'><%= url %> </a></font></td> <td><font size =3><a href="<%= userUrls[url].longURL%>"><%=  userUrls[url].longURL%> </a></font></td><td><button type="submit">Delete</button></td><td><a href ='/urls/<%= url %>'>Edit</a></td>
       </table>
-    </form>  
-  <% } %>
-    <button><a style="font-size:20px; padding:10px;"href="/urls/new">Add a new URL here!</a></button>
+      <% for (url in userUrls) { %>
+      <form method="POST" action="/urls/<%=url%>/delete">
+        <table cellpadding="15" cellspacing="2">
+          <td><font size =3><a href='/u/<%= url %>'><%= url %> </a></font></td> <td><font size =3><a href="<%= userUrls[url].longURL%>"><%=  userUrls[url].longURL%> </a></font></td><td><button type="submit">Delete</button></td><td><a href ='/urls/<%= url %>'>Edit</a></td>
+        </table>
+      </form>  
+      <% } %>
+  <p>
+   <button><a style="font-size:20px; padding:10px;"href="/urls/new">Add a new URL here!</a></button>
+   </p>
 </body>
 </html>
