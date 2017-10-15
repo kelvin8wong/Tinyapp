@@ -1,18 +1,26 @@
-///////////////
+/////////////////EXPORTS//////////////////////////
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 const cookieParser = require('cookie-parser')
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+const cookieSession = require('cookie-session');
 
-///////////////MIDDLEWARE
+///////////////MIDDLEWARE////////////////////////
 app.set("view engine", "ejs")
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ["lighthouselab"],
+  maxAge: 24 * 60 * 60 * 1000
+}));
+
 //middleware to pass user_id
 app.use(function(req, res, next){
-  let id = req.cookies.user_id;
+  let id = req.session.user_id;
   if (id){
     res.locals.user = users[id];
   } else { 
@@ -21,7 +29,7 @@ app.use(function(req, res, next){
      next();
    });
 
-//////////////DATABASE////////
+//////////////DATABASE//////////////////////////////
 const urlDatabase = {
   "b2xVn2": {
     longURL: "http://www.lighthouselabs.ca",
@@ -45,7 +53,7 @@ const users = {
     hashedPassword: "123"
   }
 };
-///////////////FUNCTIONS
+///////////////FUNCTIONS///////////////////////////
 
 //to get random id
 function generateRandomString() {
@@ -72,6 +80,7 @@ function urlsForUser(id) {
   return  obj;
 }
 
+//////////////////////ROUTE/////////////////////
 //home page
 app.get('/', (req, res) => {
   res.render('urls_login');
@@ -87,7 +96,7 @@ app.post('/register', (req,res) => {
   let id = generateRandomString();
   let email = req.body.email;
   let password = req.body.password;
-  const hashedPassword = bcrypt.hashSync(password, 10);
+  let hashedPassword = bcrypt.hashSync(password, 10);
   if (email === "" || hashedPassword === "") {
     res.status(400).send('Email or password field cannot be empty!');
     return;
@@ -100,7 +109,7 @@ app.post('/register', (req,res) => {
     }
   }
   users[id] = { id, email, hashedPassword };
-  res.cookie("user_id", id);
+  req.session.user_id = id;
   res.redirect("/urls")
 });
 
@@ -112,7 +121,7 @@ app.post('/login', (req, res) => {
     const user = users[user_id];
     if (email === user.email) {
       if (bcrypt.compareSync(password, user.hashedPassword)){
-        res.cookie("user_id", user.id);
+        req.session.user_id = user_id;
         res.redirect("/urls");
         return;
       }
@@ -128,9 +137,8 @@ app.get('/login', (req, res) => {
  
 //to go to index page with user logged in
 app.get("/urls", (req, res) => {
-  let user_id = req.cookies["user_id"];
+  let user_id = req.session.user_id;
   let templateVars = { 
-    urls: urlDatabase[req.cookies.id],
     userUrls : urlsForUser(user_id),
     user: user_id
   };
@@ -145,8 +153,8 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
-    urlDatabase[shortURL] = {
-    userID: req.cookies["user_id"],
+  urlDatabase[shortURL] = {
+    userID: req.session.user_id,
     shortURL: shortURL,
     longURL: longURL
   }
@@ -155,18 +163,17 @@ app.post("/urls", (req, res) => {
 
 // to log out
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
-  res.redirect('/login');
+  req.session = null;
+  res.redirect("/");
 });
 
 //to go to new URL submission form
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.status(400).send("Error 400: You have to log in first!");
   } else {
     let templateVars = { 
-    urls: urlDatabase[req.cookies.id],
-    user: req.cookies.user_id
+    user: req.session.user_id
     };
     res.render("urls_new", templateVars);
   }
@@ -174,13 +181,13 @@ app.get("/urls/new", (req, res) => {
 
 //to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.status(403).send("Error 403: You can't update other user's URLs!");
   } else {
     let templateVars = { 
       shortURL: req.params.id,
       longURL: urlDatabase[req.params.id].longURL,
-      user: req.cookies.user_id
+      user: req.session.user_id
     };
     res.render("urls_show", templateVars);
   }
@@ -188,7 +195,7 @@ app.get("/urls/:id", (req, res) => {
 
 //to update an url and rediect to the index page
 app.post("/urls/:id", (req, res) => {
-  if ( req.cookies["user_id"] === urlDatabase[req.params.id].userID ) {
+  if ( req.session.user_id === urlDatabase[req.params.id].userID ) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls/");
   } else { 
@@ -206,7 +213,7 @@ app.get("/u/:id", (req, res) => {
 
 //to delete an url and rediect to the index page
 app.post("/urls/:id/delete", (req, res) => {
-  if (!req.cookies.user_id) {
+  if (!req.session.user_id) {
     res.status(403).send("Error 403: You can't delete other user's URLS!");
   } else {
     delete urlDatabase[req.params.id];
