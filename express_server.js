@@ -22,18 +22,24 @@ app.use(function(req, res, next){
 
 //////////////DATABASE////////
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "userid1"
+  },
+  "9sm5xK": {
+    longURL:"http://www.google.com",
+    userID: "userid2"
+  }
 };
 
 const users = { 
-  "b2xVn2": {
-    id: "b2xVn2", 
+  "userid1": {
+    id: "userid1", 
     email: "kelvin@gmail.com", 
     password: "123456"
   },
- "9sm5xK": {
-    id: "9sm5xK", 
+  "userid2": {
+    id: "userid2", 
     email: "wong@gmail.com", 
     password: "123456"
   }
@@ -54,12 +60,16 @@ function checkPassword (inputPassword) {
   return false;
 };
 
-function checkUser(inputEmail) {
-  for (let user in users) {
-    if (inputEmail === users[user].email)
-      return user;
-   }
- }
+//to run data from user's database
+function urlsForUser(id) {
+  let obj = {};
+  for (let key in urlDatabase) {
+    if (id === urlDatabase[key].userID) {
+      obj[key] = urlDatabase[key];
+    }
+  }
+  return  obj;
+}
 
 //registration user page
 app.get('/register', (req, res) => {
@@ -93,8 +103,9 @@ app.post('/login', (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
   for (let user_id in users ) {
-    if (email === users[user_id].email && password === users[user_id].password){
-      res.cookie("user_id", user_id);
+    const user = users[user_id];
+    if (email === user.email && password === user.password){
+      res.cookie("user_id", user.id);
       res.redirect("/urls");
       return;
     } 
@@ -107,12 +118,18 @@ app.get('/login', (req, res) => {
   res.render('urls_login');
 });
  
-//home page
+//to go to index page with user logged in
 app.get("/urls", (req, res) => {
+  let user_id = req.cookies["user_id"];
   let templateVars = { 
-    urls: urlDatabase,
-    user: req.cookies.user_id,
+    urls: urlDatabase[req.cookies.id],
+    userUrls : urlsForUser(user_id),
+    user: user_id
   };
+  if (!user_id) {
+   res.status(401).render("401 ERROR: You are unauthorized!");
+   return;
+  }  
   res.render("urls_index", templateVars);
 });
 
@@ -120,51 +137,59 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   let longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
+    urlDatabase[shortURL] = {
+    userID: req.cookies["user_id"],
+    shortURL: shortURL,
+    longURL: longURL
+  }
   res.redirect('/urls');
-});
+})
 
 // to log out
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
-//new URL submission form
+//to go to new URL submission form
 app.get("/urls/new", (req, res) => {
-  let templateVars = { 
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
+  if (!req.cookies.user_id) {
+    res.redirect('/login');
+  } else {
+    let templateVars = { 
+    urls: urlDatabase[req.cookies.id],
     user: req.cookies.user_id
-   };
-  res.render("urls_new", templateVars);
+    };
+    res.render("urls_new", templateVars);
+  }
 });
 
 //to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
   let templateVars = { 
     shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: req.cookies.user_id
    };
   res.render("urls_show", templateVars);
 });
 
-//to update an url and rediect to the home page
+//to update an url and rediect to the index page
 app.post("/urls/:id", (req, res) => {
-  let shortURL = req.params.id
-  let longURL = req.body.longURL;
-  urlDatabase[shortURL] = longURL;
-  res.redirect('/urls');
+  if ( req.cookies["user_id"] === urlDatabase[req.params.id].userID ) {
+    urlDatabase[req.params.id].longURL = req.body.longURL;
+    res.redirect("/urls/");
+  } else { 
+    res.status(400).send("You can't update other user's URLs!");}
 });
 
 // to redirect short URL
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
+  let longURL = urlDatabase[req.params.id].longURL;
   res.redirect(longURL);
 });
 
-//to delete an url and rediect to the home page
+//to delete an url and rediect to the index page
 app.post("/urls/:id/delete", (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
