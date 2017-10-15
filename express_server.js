@@ -154,7 +154,7 @@ app.post('/logout', (req, res) => {
 //to go to new URL submission form
 app.get("/urls/new", (req, res) => {
   if (!req.cookies.user_id) {
-    res.redirect('/login');
+    res.status(400).send("Error 400: You have to log in first!");
   } else {
     let templateVars = { 
     urls: urlDatabase[req.cookies.id],
@@ -166,12 +166,16 @@ app.get("/urls/new", (req, res) => {
 
 //to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { 
-    shortURL: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
-    user: req.cookies.user_id
-   };
-  res.render("urls_show", templateVars);
+  if (!req.cookies.user_id) {
+    res.status(403).send("Error 403: You can't update other user's URLs!");
+  } else {
+    let templateVars = { 
+      shortURL: req.params.id,
+      longURL: urlDatabase[req.params.id].longURL,
+      user: req.cookies.user_id
+    };
+    res.render("urls_show", templateVars);
+  }
 });
 
 //to update an url and rediect to the index page
@@ -180,19 +184,26 @@ app.post("/urls/:id", (req, res) => {
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls/");
   } else { 
-    res.status(400).send("You can't update other user's URLs!");}
+    res.status(403).send("Error 403: You can't update other user's URLs!");}
 });
 
 // to redirect short URL
-app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.id].longURL;
-  res.redirect(longURL);
+app.get("/u/:id", (req, res) => {
+  if(!urlDatabase[req.params.id]){
+    res.status(404).send("Error 404 : Page not found");
+  } else {
+    res.redirect(urlDatabase[req.params.id].longURL)
+  }
 });
 
 //to delete an url and rediect to the index page
 app.post("/urls/:id/delete", (req, res) => {
-  delete urlDatabase[req.params.id];
-  res.redirect('/urls');
+  if (!req.cookies.user_id) {
+    res.status(403).send("Error 403: You can't delete other user's URLS!");
+  } else {
+    delete urlDatabase[req.params.id];
+    res.redirect('/urls');
+  }
 });
 
 app.listen(PORT, () => {
