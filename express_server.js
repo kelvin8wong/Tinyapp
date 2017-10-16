@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
 
-///////////////MIDDLEWARE////////////////////////
+///////////////MIDDLEWARES////////////////////////
 app.set("view engine", "ejs")
 app.use(cookieParser())
 app.use(bodyParser.urlencoded({extended: true}));
@@ -29,45 +29,12 @@ app.use(function(req, res, next){
      next();
    });
 
-//////////////DATABASE//////////////////////////////
-const urlDatabase = {
-  "b2xVn2": {
-    longURL: "http://www.lighthouselabs.ca",
-    userID: "userid1"
-  },
-  "9sm5xK": {
-    longURL:"http://www.google.com",
-    userID: "userid2"
-  }
-};
-
-const users = { 
-  "userid1": {
-    id: "userid1", 
-    email: "kelvin@gmail.com", 
-    hashedPassword: "123456"
-  },
-  "userid2": {
-    id: "userid2", 
-    email: "wong@gmail.com", 
-    hashedPassword: "123"
-  }
-};
 ///////////////FUNCTIONS///////////////////////////
 
 //to get random id
 function generateRandomString() {
   return Math.random().toString(36).substr(2,6);
 }
-
-function checkPassword (inputPassword) {
-  for (let user in users) {
-    if (users[user].password === inputPassword) {
-      return true;
-    }
-  }
-  return false;
-};
 
 //to run data from user's database
 function urlsForUser(id) {
@@ -83,7 +50,7 @@ function urlsForUser(id) {
 //////////////////////ROUTE/////////////////////
 //home page
 app.get('/', (req, res) => {
-  res.render('urls_login');
+  res.render('urls_login')
 });
 
 //registration user page
