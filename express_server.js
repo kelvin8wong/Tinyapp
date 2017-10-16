@@ -47,7 +47,7 @@ function urlsForUser(id) {
   return  obj;
 }
 
-//////////////////////ROUTE/////////////////////
+//////////////////////ROUTE////////////////////
 //home page
 app.get('/', (req, res) => {
   res.render('urls_login')
