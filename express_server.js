@@ -18,6 +18,32 @@ app.use(cookieSession({
   maxAge: 24 * 60 * 60 * 1000
 }));
 
+ 
+ //////////////DATABASE//////////////////////////////
+ const urlDatabase = {
+    "b2xVn2": {
+      longURL: "http://www.lighthouselabs.ca",
+      userID: "userid1"
+    },
+    "9sm5xK": {
+      longURL:"http://www.google.com",
+      userID: "userid2"
+    }
+  };
+  
+  const users = { 
+    "userid1": {
+      id: "userid1", 
+      email: "kelvin@gmail.com", 
+      hashedPassword: "123456"
+    },
+    "userid2": {
+      id: "userid2", 
+      email: "wong@gmail.com", 
+      hashedPassword: "123"
+    }
+  };
+
 //middleware to pass user_id
 app.use(function(req, res, next){
   let id = req.session.user_id;
@@ -50,12 +76,20 @@ function urlsForUser(id) {
 //////////////////////ROUTE////////////////////
 //home page
 app.get('/', (req, res) => {
-  res.render('urls_login')
+  if (!req.session.user_id){
+    res.render('urls_login')
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 //registration user page
 app.get('/register', (req, res) => {
-  res.render('urls_register');
+  if (!req.session.user_id){
+    res.render('urls_register');
+  } else {
+    res.redirect('/urls');
+  }
 });
 
 //to add new registered user and set cookies
@@ -99,7 +133,11 @@ app.post('/login', (req, res) => {
 
 //login page
 app.get('/login', (req, res) => {
-  res.render('urls_login');
+  if (!req.session.user_id){
+    res.render('urls_login');
+  } else {
+    res.redirect('/urls');
+  }
 });
  
 //to go to index page with user logged in
@@ -136,11 +174,12 @@ app.post('/logout', (req, res) => {
 
 //to go to new URL submission form
 app.get("/urls/new", (req, res) => {
-  if (!req.session.user_id) {
+  let user_id = req.session.user_id;
+  if (!user_id) {
     res.status(400).send("Error 400: You have to log in first!");
   } else {
     let templateVars = { 
-    user: req.session.user_id
+    user: user_id
     };
     res.render("urls_new", templateVars);
   }
@@ -148,7 +187,7 @@ app.get("/urls/new", (req, res) => {
 
 //to show single URL and its shortened form
 app.get("/urls/:id", (req, res) => {
-  if (!req.session.user_id) {
+  if (req.session.user_id !== urlDatabase[req.params.id].userID){ 
     res.status(403).send("Error 403: You can't update other user's URLs!");
   } else {
     let templateVars = { 
@@ -162,7 +201,9 @@ app.get("/urls/:id", (req, res) => {
 
 //to update an url and rediect to the index page
 app.post("/urls/:id", (req, res) => {
-  if ( req.session.user_id === urlDatabase[req.params.id].userID ) {
+  if(!urlDatabase[req.params.id]){
+    res.status(404).send("Error 404 : Page not found");
+  } else if ( req.session.user_id === urlDatabase[req.params.id].userID ) {
     urlDatabase[req.params.id].longURL = req.body.longURL;
     res.redirect("/urls/");
   } else { 
@@ -180,7 +221,9 @@ app.get("/u/:id", (req, res) => {
 
 //to delete an url and rediect to the index page
 app.post("/urls/:id/delete", (req, res) => {
-  if (!req.session.user_id) {
+  if(!urlDatabase[req.params.id]){
+    res.status(404).send("Error 404 : Page not found");
+  } else if (req.session.user_id !== urlDatabase[req.params.id].userID) {
     res.status(403).send("Error 403: You can't delete other user's URLS!");
   } else {
     delete urlDatabase[req.params.id];
