@@ -3,15 +3,15 @@
 TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs.
 
 ## Final Product
-!["Screenshot of root page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/:.png?raw=true)
+!["Screenshot of root page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/root.png?raw=true)
 
-!["Screenshot of register page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/:register.png?raw=true)
+!["Screenshot of register page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/register.png?raw=true)
 
-!["Screenshot of index page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/:urls:.png?raw=true)
+!["Screenshot of index page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/urls.png?raw=true)
 
-!["Screenshot of add-new-URL page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/:urls:new.png?raw=true)
+!["Screenshot of add-new-URL page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/newurl.png?raw=true)
 
-!["Screenshot of update page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/:urls:(id).png?raw=true)
+!["Screenshot of update page"](https://github.com/kelvin8wong/Tinyapp/blob/master/docs/editurl.png?raw=true)
 
 ## Built With
 
